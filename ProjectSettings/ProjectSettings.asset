@@ -843,8 +843,8 @@ PlayerSettings:
   editorAssembliesCompatibilityLevel: 1
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: Procedurally generated Islands with biomes
-  metroPackageVersion: 
+  metroPackageName: ProcedurallygeneratedIslandswithbiomes
+  metroPackageVersion: 1.0.0.0
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
@@ -852,7 +852,7 @@ PlayerSettings:
   metroCertificateNotAfter: 0000000000000000
   metroApplicationDescription: Procedurally generated Islands with biomes
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: Procedurally generated Islands with biom
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0
@@ -919,7 +919,7 @@ PlayerSettings:
   qnxGraphicConfPath: 
   apiCompatibilityLevel: 6
   captureStartupLogs: {}
-  activeInputHandler: 1
+  activeInputHandler: 2
   windowsGamepadBackendHint: 0
   cloudProjectId: f215aa25-9543-4380-a099-173f9507d9e9
   framebufferDepthMemorylessMode: 0
