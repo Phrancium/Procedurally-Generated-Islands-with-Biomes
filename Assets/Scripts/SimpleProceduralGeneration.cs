@@ -36,6 +36,10 @@ public class SimpleProceduralGeneration : MonoBehaviour
     [SerializeField] private bool generateOnStart = true;
     [SerializeField] private Material terrainMaterial;
 
+    [SerializeField] private bool renderAs3D = true;
+    [SerializeField] private float meshHeightMultiplier = 10f;
+    [SerializeField] private int meshResolution = 4;
+
     private float[,] terrainData;
     private Texture2D islandTexture;
     private MeshRenderer meshRenderer;
@@ -255,10 +259,17 @@ public class SimpleProceduralGeneration : MonoBehaviour
             }
         }
 
-        // Create a simple quad mesh if none exists
-        if (meshFilter.sharedMesh == null)
+        // 2D quad or 3D mesh
+        if (renderAs3D)
         {
-            CreateQuadMesh();
+            meshFilter.sharedMesh = Generate3DMesh(meshHeightMultiplier, meshResolution);
+        }
+        else
+        {
+            if (meshFilter.sharedMesh == null)
+            {
+                CreateQuadMesh();
+            }
         }
 
         // Apply texture to material
@@ -270,6 +281,7 @@ public class SimpleProceduralGeneration : MonoBehaviour
         terrainMaterial.mainTexture = islandTexture;
         meshRenderer.material = terrainMaterial;
     }
+
 
     private void CreateQuadMesh()
     {
@@ -338,6 +350,12 @@ public class SimpleProceduralGeneration : MonoBehaviour
         int meshHeight = height / resolution;
 
         Mesh mesh = new Mesh();
+
+        if (meshWidth * meshHeight > 65000)
+        {
+            mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+        }
+
         Vector3[] vertices = new Vector3[meshWidth * meshHeight];
         Vector2[] uv = new Vector2[meshWidth * meshHeight];
         int[] triangles = new int[(meshWidth - 1) * (meshHeight - 1) * 6];
@@ -350,17 +368,32 @@ public class SimpleProceduralGeneration : MonoBehaviour
                 int terrainX = x * resolution;
                 int terrainY = y * resolution;
 
-                float height = terrainData[terrainX, terrainY];
+                float h = terrainData[terrainX, terrainY];
 
-                vertices[y * meshWidth + x] = new Vector3(
+                float yPos;
+                float waterY = 0f;
+
+                if (h <= waterLevel)
+                {
+                    yPos = waterY;
+                }
+                else
+                {
+                    float land01 = (h - waterLevel) / (1f - waterLevel);
+                    yPos = waterY + land01 * heightMultiplier;
+                }
+
+                int idx = y * meshWidth + x;
+
+                vertices[idx] = new Vector3(
                     x - meshWidth / 2f,
-                    height * heightMultiplier,
+                    yPos,
                     y - meshHeight / 2f
                 );
 
-                uv[y * meshWidth + x] = new Vector2(
-                    (float)x / meshWidth,
-                    (float)y / meshHeight
+                uv[idx] = new Vector2(
+                    (float)x / (meshWidth - 1),
+                    (float)y / (meshHeight - 1)
                 );
             }
         }
@@ -393,4 +426,5 @@ public class SimpleProceduralGeneration : MonoBehaviour
 
         return mesh;
     }
+
 }

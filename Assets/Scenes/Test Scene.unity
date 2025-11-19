@@ -473,18 +473,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91e95658d19e77145bcdd1e1445d4cc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 800
-  height: 600
-  noiseScale1: 0.003
-  noiseScale2: 0.008
+  width: 1600
+  height: 1200
+  noiseScale1: 0.0003
+  noiseScale2: 0.00015
   noiseWeight1: 0.7
   noiseWeight2: 0.3
-  noiseStrength: 0.25
-  waterLevel: 0.4
+  noiseStrength: 0.1
+  waterLevel: 0.6
   useDistanceDistortion: 1
-  distortionAmount: 1
+  distortionAmount: 0.5
   enableHillshading: 0
-  hillshadeStrength: 10000
+  hillshadeStrength: 1000
   deepWaterColor: {r: 0, g: 0.2, b: 0.5, a: 1}
   shallowWaterColor: {r: 0.2, g: 0.4, b: 0.7, a: 1}
   sandColor: {r: 0.9, g: 0.9, b: 0.6, a: 1}
@@ -493,6 +493,9 @@ MonoBehaviour:
   snowColor: {r: 0.95, g: 0.95, b: 0.95, a: 1}
   generateOnStart: 1
   terrainMaterial: {fileID: 0}
+  renderAs3D: 1
+  meshHeightMultiplier: 20
+  meshResolution: 4
 --- !u!4 &2084971989
 Transform:
   m_ObjectHideFlags: 0
