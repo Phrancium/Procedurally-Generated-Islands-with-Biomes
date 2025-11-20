@@ -2,18 +2,19 @@ using UnityEngine;
 
 public class IslandCameraController : MonoBehaviour
 {
-    [Header("Camera Setup")]
     [SerializeField] private Transform islandTransform;
-    [SerializeField] private bool useOrthographicCamera = true;
 
     [Header("Camera Distance (Perspective Only)")]
     [SerializeField] private float perspectiveDistance = 20f;
 
-    [Header("Orthographic Size")]
-    [SerializeField] private float orthographicSize = 8f;
-
     [Header("Auto-Find Island")]
     [SerializeField] private bool autoFindIsland = true;
+
+    [Header("Camera Movement")]
+    [SerializeField] private float speed = 200f;
+    [SerializeField] private float sens = 2f;
+    private float rotationX = 0f;
+    private float rotationY = 0f;
 
     private Camera cam;
 
@@ -46,41 +47,20 @@ public class IslandCameraController : MonoBehaviour
             Debug.LogWarning("Island transform not assigned! Make sure RadialIslandGenerator is in the scene.");
             return;
         }
+        // Perspective mode
+        cam.fieldOfView = 60f;
 
-        if (useOrthographicCamera)
-        {
-            // Set to orthographic mode (best for 2D top-down view)
-            cam.orthographic = true;
-            cam.orthographicSize = orthographicSize;
+        // Position camera in front of the island
+        transform.position = new Vector3(
+            islandTransform.position.x,
+            islandTransform.position.y,
+            islandTransform.position.z - perspectiveDistance
+        );
 
-            // Position camera directly above the island, looking down
-            transform.position = new Vector3(
-                islandTransform.position.x,
-                islandTransform.position.y,
-                islandTransform.position.z - 10f  // Pull back on Z axis
-            );
+        transform.LookAt(islandTransform);
 
-            transform.rotation = Quaternion.identity; // Look straight ahead (at the quad)
-
-            Debug.Log($"Camera set to Orthographic mode at position {transform.position}");
-        }
-        else
-        {
-            // Perspective mode
-            cam.orthographic = false;
-            cam.fieldOfView = 60f;
-
-            // Position camera in front of the island
-            transform.position = new Vector3(
-                islandTransform.position.x,
-                islandTransform.position.y,
-                islandTransform.position.z - perspectiveDistance
-            );
-
-            transform.LookAt(islandTransform);
-
-            Debug.Log($"Camera set to Perspective mode at position {transform.position}");
-        }
+        Debug.Log($"Camera set to Perspective mode at position {transform.position}");
+        
     }
 
     void Update()
@@ -91,11 +71,37 @@ public class IslandCameraController : MonoBehaviour
             SetupCamera();
         }
 
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            useOrthographicCamera = !useOrthographicCamera;
-            Debug.Log($"Switched to {(useOrthographicCamera ? "Orthographic" : "Perspective")} camera");
-            SetupCamera();
-        }
+        float horizontal = 0f;
+        float vertical = 0f;
+        float upDown = 0f;
+
+        // WASD movement
+        if (Input.GetKey(KeyCode.W)) vertical += 1f;
+        if (Input.GetKey(KeyCode.S)) vertical -= 1f;
+        if (Input.GetKey(KeyCode.A)) horizontal -= 1f;
+        if (Input.GetKey(KeyCode.D)) horizontal += 1f;
+        if (Input.GetKey(KeyCode.LeftShift)) upDown += 1f;
+        if (Input.GetKey(KeyCode.LeftControl)) upDown -= 1f;
+
+        Vector3 forward = transform.forward;
+        Vector3 right = transform.right;
+        Vector3 up = Vector3.up;
+
+        Vector3 movement = (forward * vertical + right * horizontal + up * upDown).normalized;
+
+        transform.position += movement * speed * Time.deltaTime;
+
+
+        float mouseX = 0f;
+        float mouseY = 0f;
+
+        //Mouse Look
+        mouseX = Input.GetAxis("Mouse X");
+        mouseY = Input.GetAxis("Mouse Y");
+
+        rotationY += mouseX * sens;
+        rotationX += mouseY * sens * -1f;
+
+        transform.rotation = Quaternion.Euler(rotationX, rotationY, 0f);
     }
 }

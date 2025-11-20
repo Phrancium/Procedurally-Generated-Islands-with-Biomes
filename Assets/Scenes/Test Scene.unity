@@ -270,10 +270,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandTransform: {fileID: 0}
-  useOrthographicCamera: 1
   perspectiveDistance: 20
-  orthographicSize: 8
   autoFindIsland: 1
+  speed: 500
+  sens: 2
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -475,8 +475,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 1600
   height: 1200
-  noiseScale1: 0.0003
-  noiseScale2: 0.00015
+  noiseScale1: 3e-10
+  noiseScale2: 1.5e-10
   noiseWeight1: 0.7
   noiseWeight2: 0.3
   noiseStrength: 0.1

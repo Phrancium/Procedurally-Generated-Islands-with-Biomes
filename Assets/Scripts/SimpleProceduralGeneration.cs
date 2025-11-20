@@ -8,8 +8,8 @@ public class SimpleProceduralGeneration : MonoBehaviour
     [SerializeField] private int height = 600;
 
     [Header("Noise Settings")]
-    [SerializeField] private float noiseScale1 = 0.003f;
-    [SerializeField] private float noiseScale2 = 0.008f;
+    [SerializeField] private float noiseScale1 = 0.000000003f;
+    [SerializeField] private float noiseScale2 = 0.000000008f;
 
     [SerializeField] private float noiseWeight1 = 0.7f;
     [SerializeField] private float noiseWeight2 = 0.3f;
@@ -132,12 +132,22 @@ public class SimpleProceduralGeneration : MonoBehaviour
                 float combinedNoise = (noise1 * noiseWeight1 + noise2 * noiseWeight2);
 
                 // Apply noise to gradient
-                terrainData[x, y] -= (combinedNoise * noiseStrength);
+                terrainData[x, y] = (combinedNoise * noiseStrength)*100;
 
                 // Clamp to valid range
                 terrainData[x, y] = Mathf.Clamp01(terrainData[x, y]);
             }
         }
+    }
+
+    private void Grad2D()
+    {
+
+    }
+
+    private void PerlinNoise()
+    {
+
     }
 
     private void ApplyDistanceDistortion()
