@@ -1,5 +1,8 @@
-using UnityEngine;
 using System.Collections;
+using System.Drawing;
+using UnityEngine;
+using Random = UnityEngine.Random;
+using Color = UnityEngine.Color;
 
 public class SimpleProceduralGeneration : MonoBehaviour
 {
@@ -8,6 +11,9 @@ public class SimpleProceduralGeneration : MonoBehaviour
     [SerializeField] private int height = 600;
 
     [Header("Noise Settings")]
+    [SerializeField] private int gradiantWidth = 4;
+    [SerializeField] private int gradiantHeight = 4;
+
     [SerializeField] private float noiseScale1 = 0.000000003f;
     [SerializeField] private float noiseScale2 = 0.000000008f;
 
@@ -15,14 +21,20 @@ public class SimpleProceduralGeneration : MonoBehaviour
     [SerializeField] private float noiseWeight2 = 0.3f;
     [SerializeField] private float noiseStrength = 0.25f;
 
+    [SerializeField] private float islandHeight = 8f;
+    [SerializeField] private int VoxelSize = 50;
+
     [Header("Island Shape")]
     [SerializeField] private float waterLevel = 0.4f;
     [SerializeField] private bool useDistanceDistortion = true;
     [SerializeField] private float distortionAmount = 1.0f;
 
+    [SerializeField] private bool useRadial = false;
+    [SerializeField] private bool useVoxels = true;
+
     [Header("Shading")]
     [SerializeField] private bool enableHillshading = true;
-    [SerializeField] private float hillshadeStrength = 10000f;
+    [SerializeField] private float hillshadeStrength = 1000f;
 
     [Header("Colors")]
     [SerializeField] private Color deepWaterColor = new Color(0.0f, 0.2f, 0.5f);
@@ -59,17 +71,36 @@ public class SimpleProceduralGeneration : MonoBehaviour
     {
         seed = Random.Range(0, 100000);
 
-        terrainData = GenerateRadialGradient();
-        ApplyNoiseLayers();
-
-        if (useDistanceDistortion)
+        if (useRadial)
         {
-            ApplyDistanceDistortion();
+            terrainData = GenerateRadialGradient();
+            ApplyNoiseLayers();
+        }
+        else
+        {
+            generateTerrainNoise();
+
+            
         }
 
-        CreateIslandTexture();
+        if (useVoxels)
+        {
+            createVoxelMap();
+        }
+        else
+        {
+            if (useDistanceDistortion)
+            {
+                ApplyDistanceDistortion();
+            }
 
-        ApplyToMesh();
+            CreateIslandTexture();
+
+            ApplyToMesh();
+        }
+
+
+        
     }
 
 
@@ -140,15 +171,119 @@ public class SimpleProceduralGeneration : MonoBehaviour
         }
     }
 
-    private void Grad2D()
+    private void generateTerrainNoise()
     {
-
+        terrainData = new float[width, height];
+        PerlinNoise(terrainData, gradiantWidth, gradiantHeight, islandHeight);
+        
     }
 
-    private void PerlinNoise()
+    private static float lerp(float a, float b, float w)
     {
-
+        return a*(1-w) + b*w;
     }
+
+    private static float[,,] Grad2D(int x, int y)
+    {
+        float[,,] grid = new float[x, y, 2];
+
+        for(int i = 0; i < x; i++)
+        {
+            for(int j = 0; j < y; j++)
+            {
+                float theta = Random.Range(0f, Mathf.PI * 2f);
+                grid[i, j, 0] = Mathf.Cos(theta);
+                grid[i, j, 1] = Mathf.Sin(theta);
+            }
+        }
+
+        return grid;
+    }
+
+    public static void PerlinNoise(float[,] texture, int sizex, int sizey, float amp)
+    {
+        float[,,] g2d = Grad2D(sizex, sizey);
+
+        int textureWidth = texture.GetLength(0);
+        int textureHeight = texture.GetLength(1);
+
+        for (int i = 0; i < textureWidth; i++)
+        {
+            for (int j = 0; j < textureHeight; j++)
+            {
+                float gridx = (i * (sizex - 1f)) / textureWidth;
+                float gridy = (j * (sizey - 1f)) / textureHeight;
+
+                int x = Mathf.FloorToInt(gridx);
+                int y = Mathf.FloorToInt(gridy);
+                float w = gridx - x;
+                float v = gridy - y;
+
+                float[] a = new float[] { g2d[x, y, 0], g2d[x, y, 1] };
+                float[] b = new float[] { g2d[x+1, y, 0], g2d[x+1, y, 1] };
+                float[] c = new float[] { g2d[x, y+1, 0], g2d[x, y+1, 1] };
+                float[] d = new float[] { g2d[x+1, y+1, 0], g2d[x+1, y+1, 1] };
+
+
+                float dotA = a[0]*w + a[1]*v;
+                float dotB = b[0] * (w-1) + b[1] * v;
+                float dotC = c[0] * w + c[1] * (v-1);
+                float dotD = d[0] * (w-1) + d[1] * (v-1);
+
+                float unscaled = lerp(lerp(dotA, dotB, w), lerp(dotC, dotD, w), v);
+
+                texture[i, j] = (unscaled + 1f) * amp / 2f;
+            }
+        }
+    }
+
+    private void createVoxelMap()
+    {
+        for (int x = 0; x < width/VoxelSize; x++)
+        {
+            for (int y = 0; y < height/VoxelSize; y++)
+            {
+                //float heightValue = terrainData[x, y];
+                float heightValue = getAverageHeight(x*VoxelSize, y*VoxelSize, VoxelSize);
+                if (useRadial)
+                {
+                    heightValue = heightValue * islandHeight;
+                }
+                int h = Mathf.FloorToInt(heightValue);
+                for(int i = 0; i <= h; i++)
+                {
+                    createVoxel(new Vector3(x*VoxelSize+VoxelSize/2, i*VoxelSize+VoxelSize/2, y*VoxelSize+VoxelSize/2), GetColorForHeight(i/islandHeight), VoxelSize);
+                }
+            }
+        }
+    }
+
+    private float getAverageHeight(int startX, int startY, int size)
+    {
+        float total = 0f;
+        int count = 0;
+        for(int x = startX; x < startX + size; x++)
+        {
+            for(int y = startY; y < startY + size; y++)
+            {
+                if(x < width && y < height)
+                {
+                    total += terrainData[x, y];
+                    count++;
+                }
+            }
+        }
+        return total / count;
+    }
+
+    private void createVoxel(Vector3 position, Color color, int size)
+    {
+        GameObject voxel = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        voxel.transform.position = position;
+        voxel.transform.localScale = Vector3.one * size;
+        voxel.GetComponent<MeshRenderer>().material.color = color;
+    }
+    
 
     private void ApplyDistanceDistortion()
     {

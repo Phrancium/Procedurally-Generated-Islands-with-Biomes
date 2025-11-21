@@ -272,7 +272,7 @@ MonoBehaviour:
   islandTransform: {fileID: 0}
   perspectiveDistance: 20
   autoFindIsland: 1
-  speed: 500
+  speed: 200
   sens: 2
 --- !u!1 &410087039
 GameObject:
@@ -444,6 +444,90 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1664726130
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1664726132}
+  - component: {fileID: 1664726131}
+  m_Layer: 0
+  m_Name: NoiseVisualizer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1664726131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1664726130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19633469f27b4dc4a91ba61ffb96ac3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  width: 512
+  height: 512
+  gridSizeX: 4
+  gridSizeY: 4
+  amplitude: 1
+  seed: 12345
+  generateOnStart: 1
+  showInSceneView: 1
+  regenerateKey: 32
+  useColorGradient: 0
+  colorGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+--- !u!4 &1664726132
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1664726130}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 54.789654, y: -44.830605, z: -11.170067}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2084971987
 GameObject:
   m_ObjectHideFlags: 0
@@ -473,16 +557,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91e95658d19e77145bcdd1e1445d4cc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 1600
-  height: 1200
+  width: 800
+  height: 600
+  gradiantWidth: 10
+  gradiantHeight: 10
   noiseScale1: 3e-10
   noiseScale2: 1.5e-10
   noiseWeight1: 0.7
   noiseWeight2: 0.3
   noiseStrength: 0.1
-  waterLevel: 0.6
-  useDistanceDistortion: 1
+  islandHeight: 15
+  VoxelSize: 50
+  waterLevel: 0.4
+  useDistanceDistortion: 0
   distortionAmount: 0.5
+  useRadial: 0
+  useVoxels: 1
   enableHillshading: 0
   hillshadeStrength: 1000
   deepWaterColor: {r: 0, g: 0.2, b: 0.5, a: 1}
@@ -519,3 +609,4 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 2084971989}
+  - {fileID: 1664726132}
