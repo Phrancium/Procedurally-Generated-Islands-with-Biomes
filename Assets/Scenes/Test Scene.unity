@@ -568,7 +568,7 @@ MonoBehaviour:
   noiseStrength: 0.1
   islandHeight: 15
   VoxelSize: 50
-  waterLevel: 0.4
+  waterLevel: 0.5
   useDistanceDistortion: 0
   distortionAmount: 0.5
   useRadial: 0
