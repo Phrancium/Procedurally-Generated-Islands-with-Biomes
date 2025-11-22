@@ -272,18 +272,15 @@ public class SimpleProceduralGeneration : MonoBehaviour
                 }
                 for (int i = 0; i <= h; i++)
                 {
-                    for (int i = groundHeight + 1; i <= waterHeight; i++)
-                    {
-                        createVoxel(
-                            new Vector3(
-                                x * VoxelSize + VoxelSize / 2,
-                                i * VoxelSize + VoxelSize / 2,
-                                y * VoxelSize + VoxelSize / 2),
-                            Color.Lerp(shallowWaterColor, deepWaterColor, Mathf.InverseLerp(waterHeight, groundHeight, i)),
-                            VoxelSize
-                        );
-                    }
-                }
+                    createVoxel(
+                        new Vector3(
+                            x * VoxelSize + VoxelSize / 2,
+                            i * VoxelSize + VoxelSize / 2,
+                            y * VoxelSize + VoxelSize / 2),
+                        GetColorForHeight(i / islandHeight),
+                        VoxelSize
+                    );
+            }
             }
         }
     }
