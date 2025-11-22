@@ -140,9 +140,6 @@ public class SettingsAdjuster : MonoBehaviour
     }
 
 
-    /**
-     * Attached to Start Button and sends values and transitions to next scene
-     */
     public void LoadScene()
     {
         SettingsData.width = (int)widthSlider.value;

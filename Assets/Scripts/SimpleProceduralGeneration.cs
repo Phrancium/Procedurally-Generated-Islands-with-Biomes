@@ -264,7 +264,11 @@ public class SimpleProceduralGeneration : MonoBehaviour
                     heightValue = heightValue * islandHeight;
                 }
                 int h = Mathf.FloorToInt(heightValue);
-                for(int i = 0; i <= h; i++)
+                if(h < waterLevel * islandHeight)
+                {
+                    h = Mathf.FloorToInt(waterLevel * islandHeight);
+                }
+                for (int i = 0; i <= h; i++)
                 {
                     createVoxel(new Vector3(x*VoxelSize+VoxelSize/2, i*VoxelSize+VoxelSize/2, y*VoxelSize+VoxelSize/2), GetColorForHeight(i/islandHeight), VoxelSize);
                 }
