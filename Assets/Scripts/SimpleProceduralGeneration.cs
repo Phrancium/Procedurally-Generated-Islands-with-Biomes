@@ -253,12 +253,14 @@ public class SimpleProceduralGeneration : MonoBehaviour
 
     private void createVoxelMap()
     {
-        for (int x = 0; x < width/VoxelSize; x++)
+        int waterHeight = Mathf.FloorToInt(waterLevel * islandHeight);
+
+        for (int x = 0; x < width / VoxelSize; x++)
         {
-            for (int y = 0; y < height/VoxelSize; y++)
+            for (int y = 0; y < height / VoxelSize; y++)
             {
-                //float heightValue = terrainData[x, y];
-                float heightValue = getAverageHeight(x*VoxelSize, y*VoxelSize, VoxelSize);
+                float heightValue = getAverageHeight(x * VoxelSize, y * VoxelSize, VoxelSize);
+
                 if (useRadial)
                 {
                     heightValue = heightValue * islandHeight;
@@ -270,11 +272,22 @@ public class SimpleProceduralGeneration : MonoBehaviour
                 }
                 for (int i = 0; i <= h; i++)
                 {
-                    createVoxel(new Vector3(x*VoxelSize+VoxelSize/2, i*VoxelSize+VoxelSize/2, y*VoxelSize+VoxelSize/2), GetColorForHeight(i/islandHeight), VoxelSize);
+                    for (int i = groundHeight + 1; i <= waterHeight; i++)
+                    {
+                        createVoxel(
+                            new Vector3(
+                                x * VoxelSize + VoxelSize / 2,
+                                i * VoxelSize + VoxelSize / 2,
+                                y * VoxelSize + VoxelSize / 2),
+                            Color.Lerp(shallowWaterColor, deepWaterColor, Mathf.InverseLerp(waterHeight, groundHeight, i)),
+                            VoxelSize
+                        );
+                    }
                 }
             }
         }
     }
+
 
     private float getAverageHeight(int startX, int startY, int size)
     {
