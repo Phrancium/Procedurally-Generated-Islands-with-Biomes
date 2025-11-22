@@ -59,6 +59,20 @@ public class SimpleProceduralGeneration : MonoBehaviour
 
     private int seed;
 
+    private void Awake()
+    {
+        width = SettingsData.width;
+        height = SettingsData.height;
+        gradiantWidth = SettingsData.gradientWidth;
+        gradiantHeight = SettingsData.gradientHeight;
+        noiseScale1 = SettingsData.noiseScale1;
+        noiseScale2 = SettingsData.noiseScale2;
+        noiseWeight1 = SettingsData.noiseWeight1;
+        noiseWeight2 = SettingsData.noiseWeight2;
+        islandHeight = SettingsData.islandHeight;
+        VoxelSize = SettingsData.voxelSize;
+    }
+
     void Start()
     {
         if (generateOnStart)
