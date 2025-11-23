@@ -69,8 +69,11 @@ public class SimpleProceduralGeneration : MonoBehaviour
         noiseScale2 = SettingsData.noiseScale2;
         noiseWeight1 = SettingsData.noiseWeight1;
         noiseWeight2 = SettingsData.noiseWeight2;
+        waterLevel = SettingsData.waterLevel;
         islandHeight = SettingsData.islandHeight;
         VoxelSize = SettingsData.voxelSize;
+        useVoxels = SettingsData.isVoxel;
+        useRadial = SettingsData.isRadial;
     }
 
     void Start()

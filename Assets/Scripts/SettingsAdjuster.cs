@@ -7,33 +7,25 @@ using UnityEngine.UI;
 public class SettingsAdjuster : MonoBehaviour
 {
     [Header("Island Width")]
-    [SerializeField] private TextMeshProUGUI widthValue;
-    public Slider widthSlider;
+    public TMP_InputField widthInputField;
 
     [Header("Island Height")]
-    [SerializeField] private TextMeshProUGUI heightValue;
-    public Slider heightSlider;
+    public TMP_InputField heightInputField;
 
     [Header("Island Gradient Width")]
-    [SerializeField] private TextMeshProUGUI gradientWidthValue;
-    public Slider gradientWidthSlider;
+    public TMP_InputField gradientWidthInputField;
 
     [Header("Island Gradient Height")]
-    [SerializeField] private TextMeshProUGUI gradientHeightValue;
-    public Slider gradientHeightSlider;
+    public TMP_InputField gradientHeightInputField;
 
     [Header("Island Noise")]
-    [SerializeField] private TextMeshProUGUI noiseScaleValue1;
-    public Slider noiseScale1Slider;
+    public TMP_InputField noiseScale1InputField;
+    public TMP_InputField noiseScale2InputField;
+    public TMP_InputField noiseWeight1InputField;
+    public TMP_InputField noiseWeight2InputField;
 
-    [SerializeField] private TextMeshProUGUI noiseScaleValue2;
-    public Slider noiseScale2Slider;
-
-    [SerializeField] private TextMeshProUGUI noiseWeightValue1;
-    public Slider noiseWeight1Slider;
-
-    [SerializeField] private TextMeshProUGUI noiseWeightValue2;
-    public Slider noiseWeight2Slider;
+    [Header("Water Level")]
+    public TMP_InputField waterLevelInputField;
 
     [Header("Island Vertical Height")]
     [SerializeField] private TextMeshProUGUI islandHeightValue;
@@ -42,6 +34,11 @@ public class SettingsAdjuster : MonoBehaviour
     [Header("Voxel")]
     [SerializeField] private TextMeshProUGUI voxelSizeValue;
     public Slider voxelSizeSlider;
+
+    [Header("Island Style")]
+    [SerializeField] private Toggle voxelToggle;
+    [SerializeField] private Toggle radialToggle;
+
 
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject loadingPanel;
@@ -91,42 +88,83 @@ public class SettingsAdjuster : MonoBehaviour
 
     public void UpdateWidthValue()
     {
-        widthValue.text = widthSlider.value.ToString();
+        int widthValue = int.Parse(widthInputField.text);
+        if (widthValue < 500 || widthValue > 3200)
+        {
+            widthInputField.text = "500";
+        }
     }
 
     public void UpdateHeightValue()
     {
-        heightValue.text = heightSlider.value.ToString();
+        int heightValue = int.Parse(heightInputField.text);
+        if (heightValue < 500 || heightValue > 3200)
+        {
+            heightInputField.text = "500";
+        }
     }
 
     public void UpdateGradientWidthValue()
     {
-        gradientWidthValue.text = gradientWidthSlider.value.ToString();
+        int gradientWidthValue = int.Parse(gradientWidthInputField.text);
+        if (gradientWidthValue < 4 || gradientWidthValue > 20)
+        {
+            gradientWidthInputField.text = "4";
+        }
     }
 
     public void UpdateGradientHeightValue()
     {
-        gradientHeightValue.text = gradientHeightSlider.value.ToString();
+        int gradientHeightValue = int.Parse(gradientHeightInputField.text);
+        if (gradientHeightValue < 4 || gradientHeightValue > 20)
+        {
+            gradientHeightInputField.text = "4";
+        }
     }
 
     public void UpdateNoiseScaleValue1()
     {
-        noiseScaleValue1.text = noiseScale1Slider.value.ToString();
+        float noiseScaleValue = float.Parse(noiseScale1InputField.text);
+        if (noiseScaleValue < 0.0 || noiseScaleValue > 1.0)
+        {
+            noiseScale1InputField.text = "0.0";
+        }
     }
 
     public void UpdateNoiseScaleValue2()
     {
-        noiseScaleValue2.text = noiseScale2Slider.value.ToString();
+        float noiseScaleValue = float.Parse(noiseScale2InputField.text);
+        if (noiseScaleValue < 0.0 || noiseScaleValue > 1.0)
+        {
+            noiseScale2InputField.text = "0.0";
+        }
     }
     
     public void UpdateNoiseWeightValue1()
     {
-        noiseWeightValue1.text = noiseWeight1Slider.value.ToString();
+        float noiseWeightValue = float.Parse(noiseWeight1InputField.text);
+        if (noiseWeightValue < 0.0 || noiseWeightValue > 1.0)
+        {
+            noiseWeight1InputField.text = "0.0";
+        }
     }
 
     public void UpdateNoiseWeightValue2()
     {
-        noiseWeightValue2.text = noiseWeight2Slider.value.ToString();
+        float noiseWeightValue = float.Parse(noiseWeight2InputField.text);
+        if (noiseWeightValue < 0.0 || noiseWeightValue > 1.0)
+        {
+            noiseWeight2InputField.text = "0.0";
+        }
+    }
+
+    public void UpdateWaterLevelValue()
+    {
+        float waterLevelValue = float.Parse(waterLevelInputField.text);
+        if (waterLevelValue < 0.0 || waterLevelValue > 1.0)
+        {
+            waterLevelInputField.text = "0.0";
+        }
     }
     
     public void UpdateIslandHeightValue()
@@ -142,16 +180,19 @@ public class SettingsAdjuster : MonoBehaviour
 
     public void LoadScene()
     {
-        SettingsData.width = (int)widthSlider.value;
-        SettingsData.height = (int)heightSlider.value;
-        SettingsData.gradientWidth = (int)gradientWidthSlider.value;
-        SettingsData.gradientHeight = (int)gradientHeightSlider.value;
-        SettingsData.noiseScale1 = (int)noiseScale1Slider.value;
-        SettingsData.noiseScale2 = (int)noiseScale2Slider.value;
-        SettingsData.noiseWeight1 = (int)noiseWeight1Slider.value;
-        SettingsData.noiseWeight2 = (int)noiseWeight2Slider.value;
+        SettingsData.width = int.Parse(widthInputField.text); ;
+        SettingsData.height = int.Parse(heightInputField.text);
+        SettingsData.gradientWidth = int.Parse(gradientWidthInputField.text);
+        SettingsData.gradientHeight = int.Parse(gradientHeightInputField.text);
+        SettingsData.noiseScale1 = float.Parse(noiseScale1InputField.text);
+        SettingsData.noiseScale2 = float.Parse(noiseScale2InputField.text);
+        SettingsData.noiseWeight1 = float.Parse(noiseWeight1InputField.text);
+        SettingsData.noiseWeight2 = float.Parse(noiseWeight2InputField.text);
+        SettingsData.waterLevel = float.Parse(waterLevelInputField.text);
         SettingsData.islandHeight = (int)islandHeightSlider.value;
         SettingsData.voxelSize = (int)voxelSizeSlider.value;
+        SettingsData.isVoxel = voxelToggle.isOn;
+        SettingsData.isRadial = radialToggle.isOn;
 
         settingsPanel.SetActive(false);
         loadingPanel.SetActive(true);

@@ -12,6 +12,11 @@ public static class SettingsData
     public static float noiseWeight1 = 0.7f;
     public static float noiseWeight2 = 0.3f;
 
+    public static float waterLevel = 0.1f;
     public static float islandHeight = 15f;
     public static int voxelSize = 25;
+
+    public static bool isVoxel = true;
+    public static bool isRadial = false;
+
 }
