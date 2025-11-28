@@ -14,7 +14,7 @@ public static class SettingsData
 
     public static float waterLevel = 0.1f;
     public static float islandHeight = 15f;
-    public static int voxelSize = 25;
+    public static int voxelSize = 20;
 
     public static bool isVoxel = true;
     public static bool isRadial = false;
