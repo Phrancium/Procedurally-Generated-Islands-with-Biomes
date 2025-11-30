@@ -557,22 +557,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91e95658d19e77145bcdd1e1445d4cc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 800
-  height: 600
-  gradiantWidth: 10
-  gradiantHeight: 10
-  noiseScale1: 3e-10
-  noiseScale2: 1.5e-10
+  width: 100
+  height: 100
+  gradiantWidth: 4
+  gradiantHeight: 4
+  noiseScale1: 0.8
+  noiseScale2: 0.5
   noiseWeight1: 0.7
   noiseWeight2: 0.3
-  noiseStrength: 0.1
   islandHeight: 15
-  VoxelSize: 50
-  waterLevel: 0.5
+  VoxelSize: 1
+  waterLevel: 0.4
   useDistanceDistortion: 0
   distortionAmount: 0.5
   useRadial: 0
-  useVoxels: 1
+  useVoxels: 0
   enableHillshading: 0
   hillshadeStrength: 1000
   deepWaterColor: {r: 0, g: 0.2, b: 0.5, a: 1}

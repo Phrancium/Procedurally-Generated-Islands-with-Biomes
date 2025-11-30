@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Drawing;
 using UnityEngine;
-using Random = UnityEngine.Random;
+using static UnityEditor.Experimental.GraphView.GraphView;
 using Color = UnityEngine.Color;
+using Random = UnityEngine.Random;
 
 public class SimpleProceduralGeneration : MonoBehaviour
 {
@@ -14,18 +15,19 @@ public class SimpleProceduralGeneration : MonoBehaviour
     [SerializeField] private int gradiantWidth = 4;
     [SerializeField] private int gradiantHeight = 4;
 
-    [SerializeField] private float noiseScale1 = 0.000000003f;
-    [SerializeField] private float noiseScale2 = 0.000000008f;
+    private float PositiveNoiseMult = 1.0f;
+    private float NegativeNoiseMult = 1.0f;
+    [SerializeField] private float noiseScale1 = 0.3f;
+    [SerializeField] private float noiseScale2 = 0.8f;
 
     [SerializeField] private float noiseWeight1 = 0.7f;
     [SerializeField] private float noiseWeight2 = 0.3f;
-    [SerializeField] private float noiseStrength = 0.25f;
 
     [SerializeField] private float islandHeight = 8f;
     [SerializeField] private int VoxelSize = 50;
 
     [Header("Island Shape")]
-    [SerializeField] private float waterLevel = 0.4f;
+    [SerializeField] private float waterLevel = 0.5f;
     [SerializeField] private bool useDistanceDistortion = true;
     [SerializeField] private float distortionAmount = 1.0f;
 
@@ -57,6 +59,8 @@ public class SimpleProceduralGeneration : MonoBehaviour
     private MeshRenderer meshRenderer;
     private MeshFilter meshFilter;
 
+    private string biometype = "Island";
+
     private int seed;
 
     private void Awake()
@@ -74,6 +78,7 @@ public class SimpleProceduralGeneration : MonoBehaviour
         VoxelSize = SettingsData.voxelSize;
         useVoxels = SettingsData.isVoxel;
         useRadial = SettingsData.isRadial;
+        biometype = SettingsData.biomeType;
     }
 
     void Start()
@@ -86,38 +91,22 @@ public class SimpleProceduralGeneration : MonoBehaviour
 
     public void GenerateIsland()
     {
-        seed = Random.Range(0, 100000);
-
-        if (useRadial)
+        switch(biometype)
         {
-            terrainData = GenerateRadialGradient();
-            ApplyNoiseLayers();
+            case "Island":
+                generateIslandNoise();
+                break;
+            case "Mountain":
+                generateMountainNoise();
+                break;
+            case "Desert":
+                generateDesertNoise();
+                break;
+            default:
+                generateTerrainNoise();
+                break;
         }
-        else
-        {
-            generateTerrainNoise();
-
-            
-        }
-
-        if (useVoxels)
-        {
-            createVoxelMap();
-        }
-        else
-        {
-            if (useDistanceDistortion)
-            {
-                ApplyDistanceDistortion();
-            }
-
-            CreateIslandTexture();
-
-            ApplyToMesh();
-        }
-
-
-        
+        createVoxelMap();
     }
 
 
@@ -143,7 +132,7 @@ public class SimpleProceduralGeneration : MonoBehaviour
                 float distance = Mathf.Sqrt(xDistance * xDistance + yDistance * yDistance);
                 float normalizedDistance = 1f - (distance / maxRadius);
 
-                gradient[x, y] = distance;
+                gradient[x, y] = normalizedDistance*islandHeight;
             }
         }
 
@@ -153,37 +142,27 @@ public class SimpleProceduralGeneration : MonoBehaviour
 
     private void ApplyNoiseLayers()
     {
-        // Use seed for consistent random offsets
-        Random.InitState(seed);
-        float offset1X = Random.Range(0f, 1000f);
-        float offset1Y = Random.Range(0f, 1000f);
-        float offset2X = Random.Range(0f, 1000f);
-        float offset2Y = Random.Range(0f, 1000f);
+
+        float[,] layer1 = new float[width, height];
+        float[,] layer2 = new float[width, height];
+        PerlinNoise(layer1, gradiantWidth, gradiantHeight, noiseScale1*islandHeight);
+        PerlinNoise(layer2, gradiantWidth, gradiantHeight, noiseScale2*islandHeight);
 
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
                 // First noise layer - large scale features
-                float noise1 = Mathf.PerlinNoise(
-                    (x + offset1X) * noiseScale1,
-                    (y + offset1Y) * noiseScale1
-                );
+                float noise1 = layer1[x, y];
 
                 // Second noise layer - fine details
-                float noise2 = Mathf.PerlinNoise(
-                    (x + offset2X) * noiseScale2,
-                    (y + offset2Y) * noiseScale2
-                );
+                float noise2 = layer2[x, y];
 
                 // Combine noise layers with weights
                 float combinedNoise = (noise1 * noiseWeight1 + noise2 * noiseWeight2);
 
                 // Apply noise to gradient
-                terrainData[x, y] = (combinedNoise * noiseStrength)*100;
-
-                // Clamp to valid range
-                terrainData[x, y] = Mathf.Clamp01(terrainData[x, y]);
+                terrainData[x, y] = (terrainData[x, y]+combinedNoise)-((noiseScale1*noiseWeight1*islandHeight)+(noiseScale2*noiseWeight2*islandHeight))/2f;
             }
         }
     }
@@ -192,7 +171,64 @@ public class SimpleProceduralGeneration : MonoBehaviour
     {
         terrainData = new float[width, height];
         PerlinNoise(terrainData, gradiantWidth, gradiantHeight, islandHeight);
-        
+    }
+
+    //creating noise generation for different biome terrains
+    private void generateMountainNoise()
+    {
+        terrainData = new float[width, height];
+        waterLevel = 0.15f;
+        islandHeight = 30f;
+        float[,] layer1 = new float[width, height];
+        float[,] layer2 = new float[width, height];
+        float[,] layer3 = new float[width, height];
+        PerlinNoise(layer1, gradiantWidth, gradiantHeight, islandHeight*.6f);
+        remapNoise(layer1, islandHeight*.7f);
+        PerlinNoise(layer2, gradiantWidth*4, gradiantHeight, islandHeight*.2f);
+        remapNoise(layer2, islandHeight*.15f);
+        PerlinNoise(layer3, gradiantWidth, gradiantHeight*4, islandHeight * .2f);
+        remapNoise(layer3, islandHeight*.15f);
+
+        for (int i = 0; i < width; i++)
+        {
+            for(int j = 0; j < height; j++)
+            {
+                if (layer1[i, j] < waterLevel*islandHeight)
+                {
+                    terrainData[i, j] = RidgedNoise(layer1[i, j]/islandHeight)*islandHeight;
+                }
+                else if (layer1[i, j] < waterLevel*islandHeight*2)
+                {
+                    terrainData[i, j] = RidgedNoise((layer1[i, j] + layer2[i, j]) / islandHeight) * islandHeight;
+                }
+                else
+                {
+                    terrainData[i, j] = RidgedNoise((layer1[i, j] + layer2[i, j] + layer3[i, j]) / islandHeight) * islandHeight;
+                }
+                
+                //terrainData[i, j] = terrainData[i, j]/9f;
+            }
+        }
+
+    }
+    private float RidgedNoise(float value)
+    {
+        return 1.0f - Mathf.Abs(value);
+    }
+
+    private void generateDesertNoise()
+    {
+        terrainData = new float[width, height];
+        waterLevel = 0.0f;
+        islandHeight = 5f;
+        PerlinNoise(terrainData, gradiantWidth, gradiantHeight, islandHeight);
+    }
+
+    private void generateIslandNoise()
+    {
+        terrainData = GenerateRadialGradient();
+        waterLevel = 0.4f;
+        ApplyNoiseLayers();
     }
 
     private static float lerp(float a, float b, float w)
@@ -249,9 +285,33 @@ public class SimpleProceduralGeneration : MonoBehaviour
 
                 float unscaled = lerp(lerp(dotA, dotB, w), lerp(dotC, dotD, w), v);
 
-                texture[i, j] = (unscaled + 1f) * amp / 2f;
+                texture[i, j] = ((unscaled) * amp / 2f) + amp/2f;
             }
         }
+    }
+
+    private void remapNoise(float[,] noiseData, float amp)
+    {
+        float min = float.MaxValue;
+        float max = float.MinValue;
+
+        for(int x = 0; x < noiseData.GetLength(0); x++)
+        {
+            for (int y = 0; y < noiseData.GetLength(1); y++)
+            {
+                if (noiseData[x, y] < min) min = noiseData[x, y];
+                if (noiseData[x, y] > max) max = noiseData[x, y];
+            }
+        }
+
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                noiseData[i, j] = ((noiseData[i, j] - min) / (max - min)) * amp;
+            }
+        }
+
     }
 
     private void createVoxelMap()
@@ -264,10 +324,8 @@ public class SimpleProceduralGeneration : MonoBehaviour
             {
                 float heightValue = getAverageHeight(x * VoxelSize, y * VoxelSize, VoxelSize);
 
-                if (useRadial)
-                {
-                    heightValue = heightValue * islandHeight;
-                }
+
+                
                 int h = Mathf.FloorToInt(heightValue);
                 if(h < waterLevel * islandHeight)
                 {

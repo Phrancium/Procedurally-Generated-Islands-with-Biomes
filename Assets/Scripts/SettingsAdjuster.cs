@@ -38,6 +38,8 @@ public class SettingsAdjuster : MonoBehaviour
     [Header("Island Style")]
     [SerializeField] private Toggle voxelToggle;
     [SerializeField] private Toggle radialToggle;
+    [SerializeField] private TMP_Dropdown biomeDropdown;
+    private string biomeType = "Default";
 
 
     [SerializeField] private GameObject settingsPanel;
@@ -89,18 +91,18 @@ public class SettingsAdjuster : MonoBehaviour
     public void UpdateWidthValue()
     {
         int widthValue = int.Parse(widthInputField.text);
-        if (widthValue < 500 || widthValue > 3200)
+        if (widthValue < 50 || widthValue > 3200)
         {
-            widthInputField.text = "500";
+            widthInputField.text = "50";
         }
     }
 
     public void UpdateHeightValue()
     {
         int heightValue = int.Parse(heightInputField.text);
-        if (heightValue < 500 || heightValue > 3200)
+        if (heightValue < 50 || heightValue > 3200)
         {
-            heightInputField.text = "500";
+            heightInputField.text = "50";
         }
     }
 
@@ -177,6 +179,12 @@ public class SettingsAdjuster : MonoBehaviour
         voxelSizeValue.text = voxelSizeSlider.value.ToString();
     }
 
+    public void UpdateBiomeSelection()
+    {
+        biomeType = biomeDropdown.options[biomeDropdown.value].text;
+        print("Selected Biome: " + biomeType);
+    }
+
 
     public void LoadScene()
     {
@@ -193,6 +201,7 @@ public class SettingsAdjuster : MonoBehaviour
         SettingsData.voxelSize = (int)voxelSizeSlider.value;
         SettingsData.isVoxel = voxelToggle.isOn;
         SettingsData.isRadial = radialToggle.isOn;
+        SettingsData.biomeType = biomeType;
 
         settingsPanel.SetActive(false);
         loadingPanel.SetActive(true);

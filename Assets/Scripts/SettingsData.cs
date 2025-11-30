@@ -19,4 +19,6 @@ public static class SettingsData
     public static bool isVoxel = true;
     public static bool isRadial = false;
 
+
+    public static string biomeType = "Default";
 }
