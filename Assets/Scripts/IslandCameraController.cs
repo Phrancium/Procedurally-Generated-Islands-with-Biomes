@@ -11,7 +11,7 @@ public class IslandCameraController : MonoBehaviour
     [SerializeField] private bool autoFindIsland = true;
 
     [Header("Camera Movement")]
-    [SerializeField] private float speed = 200f;
+    [SerializeField] private float speed = 50f;
     [SerializeField] private float sens = 2f;
     private float rotationX = 0f;
     private float rotationY = 0f;

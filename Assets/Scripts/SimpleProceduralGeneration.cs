@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Drawing;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using Color = UnityEngine.Color;
 using Random = UnityEngine.Random;
@@ -15,8 +16,6 @@ public class SimpleProceduralGeneration : MonoBehaviour
     [SerializeField] private int gradiantWidth = 4;
     [SerializeField] private int gradiantHeight = 4;
 
-    private float PositiveNoiseMult = 1.0f;
-    private float NegativeNoiseMult = 1.0f;
     [SerializeField] private float noiseScale1 = 0.3f;
     [SerializeField] private float noiseScale2 = 0.8f;
 
@@ -28,15 +27,6 @@ public class SimpleProceduralGeneration : MonoBehaviour
 
     [Header("Island Shape")]
     [SerializeField] private float waterLevel = 0.5f;
-    [SerializeField] private bool useDistanceDistortion = true;
-    [SerializeField] private float distortionAmount = 1.0f;
-
-    [SerializeField] private bool useRadial = false;
-    [SerializeField] private bool useVoxels = true;
-
-    [Header("Shading")]
-    [SerializeField] private bool enableHillshading = true;
-    [SerializeField] private float hillshadeStrength = 1000f;
 
     [Header("Colors")]
     [SerializeField] private Color deepWaterColor = new Color(0.0f, 0.2f, 0.5f);
@@ -50,18 +40,16 @@ public class SimpleProceduralGeneration : MonoBehaviour
     [SerializeField] private bool generateOnStart = true;
     [SerializeField] private Material terrainMaterial;
 
-    [SerializeField] private bool renderAs3D = true;
-    [SerializeField] private float meshHeightMultiplier = 10f;
-    [SerializeField] private int meshResolution = 4;
+    [Header("Asset Models")]
+    public GameObject cactus;
+    public GameObject tree;
+    public GameObject wintertree;
+    public GameObject palmtree;
 
     private float[,] terrainData;
     private Texture2D islandTexture;
-    private MeshRenderer meshRenderer;
-    private MeshFilter meshFilter;
 
     private string biometype = "Island";
-
-    private int seed;
 
     private void Awake()
     {
@@ -76,8 +64,6 @@ public class SimpleProceduralGeneration : MonoBehaviour
         waterLevel = SettingsData.waterLevel;
         islandHeight = SettingsData.islandHeight;
         VoxelSize = SettingsData.voxelSize;
-        useVoxels = SettingsData.isVoxel;
-        useRadial = SettingsData.isRadial;
         biometype = SettingsData.biomeType;
         deepWaterColor = SettingsData.deepColor;
         shallowWaterColor = SettingsData.shallowColor;
@@ -113,6 +99,7 @@ public class SimpleProceduralGeneration : MonoBehaviour
                 break;
         }
         createVoxelMap();
+
     }
 
 
@@ -336,6 +323,15 @@ public class SimpleProceduralGeneration : MonoBehaviour
                 if(h < waterLevel * islandHeight)
                 {
                     h = Mathf.FloorToInt(waterLevel * islandHeight);
+
+                    if(biometype == "Mountain")
+                    {
+                        addAssets(x, y, h);
+                    }
+                }
+                else
+                {
+                    addAssets(x, y, h);
                 }
                 for (int i = 0; i <= h; i++)
                 {
@@ -347,11 +343,60 @@ public class SimpleProceduralGeneration : MonoBehaviour
                         GetColorForHeight(i / islandHeight),
                         VoxelSize
                     );
-            }
+                } 
             }
         }
     }
 
+    private void addAssets(int i, int j, int h)
+    {
+        float landHeight = ((h/islandHeight) - waterLevel) / (1f - waterLevel);
+
+        switch (biometype)
+        {
+            case "Desert":
+                if(Random.Range(0f, 1f) < 0.01f)
+                {
+                    Vector3 pos = new Vector3(i, h + 1.4f, j);
+                    createModel(pos, cactus);
+                }
+                break;
+            case "Mountain":
+                
+
+                if (landHeight < .1f && Random.Range(0f, 1f) < 0.3f)
+                {
+                    Vector3 pos = new Vector3(i, h+1.5f, j);
+                    createModel(pos, tree);
+                }
+                else if (landHeight > .8f && Random.Range(0f, 1f) < 0.1f)
+                {
+                    Vector3 pos = new Vector3(i, h+0.5f, j);
+                    createModel(pos, wintertree);
+                }
+                break;
+            case "Island":
+                if (landHeight > 0.1f && Random.Range(0f, 1f) < 0.02f)
+                {
+                    Vector3 pos = new Vector3(i, h+1f, j);
+                    createModel(pos, palmtree);
+                }
+                break;
+            default:
+                if (landHeight > 0.2f && Random.Range(0f, 1f) < 0.06f)
+                {
+                    Vector3 pos = new Vector3(i, h+1.5f, j);
+                    createModel(pos, tree);
+                }
+                break;
+        }
+    }
+
+    private void createModel(Vector3 pos, GameObject model)
+    {
+        GameObject instance = Instantiate(model, pos, Quaternion.Euler(-90, 0, 0));
+        instance.transform.localScale = instance.transform.localScale * VoxelSize/2;
+    }
 
     private float getAverageHeight(int startX, int startY, int size)
     {
@@ -380,75 +425,6 @@ public class SimpleProceduralGeneration : MonoBehaviour
     }
     
 
-    private void ApplyDistanceDistortion()
-    {
-        float centerX = width / 2f;
-        float centerY = height / 2f;
-        float maxRadius = Mathf.Sqrt(centerX * centerX + centerY * centerY);
-
-        // Create a new distorted gradient
-        float[,] distortedData = new float[width, height];
-
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                float xDistance = Mathf.Abs(centerX - x);
-                float yDistance = Mathf.Abs(centerY - y);
-                float distance = Mathf.Sqrt(xDistance * xDistance + yDistance * yDistance);
-
-                Random.InitState(seed + x * height + y); // Deterministic randomness per pixel
-                float randomPower = 2f - Random.Range(0f, distortionAmount);
-
-                // Apply the distortion power
-                float distortedDistance = Mathf.Pow(distance / maxRadius, randomPower);
-                float distortedValue = 1f - distortedDistance;
-
-                // Blend with existing terrain data
-                distortedData[x, y] = terrainData[x, y] * distortedValue;
-            }
-        }
-
-        terrainData = distortedData;
-    }
-
-    private void CreateIslandTexture()
-    {
-        islandTexture = new Texture2D(width, height);
-        islandTexture.filterMode = FilterMode.Point;
-
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                float height = terrainData[x, y];
-
-                // Calculate hillshading if enabled
-                float hillshade = 0f;
-                if (enableHillshading && x > 0)
-                {
-                    float heightDifference = terrainData[x, y] - terrainData[x - 1, y];
-                    hillshade = heightDifference * hillshadeStrength;
-                }
-
-                // Get base color based on height
-                Color pixelColor = GetColorForHeight(height);
-
-                // Apply hillshading to RGB channels
-                if (enableHillshading)
-                {
-                    pixelColor.r = Mathf.Clamp01(pixelColor.r + hillshade / 255f);
-                    pixelColor.g = Mathf.Clamp01(pixelColor.g + hillshade / 255f);
-                    pixelColor.b = Mathf.Clamp01(pixelColor.b + hillshade / 255f);
-                }
-
-                islandTexture.SetPixel(x, y, pixelColor);
-            }
-        }
-
-        islandTexture.Apply();
-    }
-
     private Color GetColorForHeight(float height)
     {
         if (height < waterLevel)
@@ -476,100 +452,6 @@ public class SimpleProceduralGeneration : MonoBehaviour
         {
             return Color.Lerp(rockColor, snowColor, (landHeight - 0.8f) / 0.2f);
         }
-    }
-
-    private void ApplyToMesh()
-    {
-        // Get or create mesh components
-        if (meshRenderer == null)
-        {
-            meshRenderer = GetComponent<MeshRenderer>();
-            if (meshRenderer == null)
-            {
-                meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            }
-        }
-
-        if (meshFilter == null)
-        {
-            meshFilter = GetComponent<MeshFilter>();
-            if (meshFilter == null)
-            {
-                meshFilter = gameObject.AddComponent<MeshFilter>();
-            }
-        }
-
-        // 2D quad or 3D mesh
-        if (renderAs3D)
-        {
-            meshFilter.sharedMesh = Generate3DMesh(meshHeightMultiplier, meshResolution);
-        }
-        else
-        {
-            if (meshFilter.sharedMesh == null)
-            {
-                CreateQuadMesh();
-            }
-        }
-
-        // Apply texture to material
-        if (terrainMaterial == null)
-        {
-            terrainMaterial = new Material(Shader.Find("Unlit/Texture"));
-        }
-
-        terrainMaterial.mainTexture = islandTexture;
-        meshRenderer.material = terrainMaterial;
-    }
-
-
-    private void CreateQuadMesh()
-    {
-        Mesh mesh = new Mesh();
-        mesh.name = "Island Quad";
-
-        // Calculate aspect ratio
-        float aspectRatio = (float)width / height;
-        float quadHeight = 10f;
-        float quadWidth = quadHeight * aspectRatio;
-
-        // Create vertices for a quad
-        Vector3[] vertices = new Vector3[4]
-        {
-            new Vector3(-quadWidth/2, -quadHeight/2, 0),
-            new Vector3(quadWidth/2, -quadHeight/2, 0),
-            new Vector3(-quadWidth/2, quadHeight/2, 0),
-            new Vector3(quadWidth/2, quadHeight/2, 0)
-        };
-
-        // UV coordinates
-        Vector2[] uv = new Vector2[4]
-        {
-            new Vector2(0, 0),
-            new Vector2(1, 0),
-            new Vector2(0, 1),
-            new Vector2(1, 1)
-        };
-
-        // Triangle indices
-        int[] triangles = new int[6]
-        {
-            0, 2, 1,
-            2, 3, 1
-        };
-
-        mesh.vertices = vertices;
-        mesh.uv = uv;
-        mesh.triangles = triangles;
-        mesh.RecalculateNormals();
-
-        meshFilter.mesh = mesh;
-    }
-
-    public void RegenerateWithNewSeed()
-    {
-        seed = Random.Range(0, 100000);
-        GenerateIsland();
     }
 
     public float[,] GetTerrainData()

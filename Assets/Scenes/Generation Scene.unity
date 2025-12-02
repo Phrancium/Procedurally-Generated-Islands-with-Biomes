@@ -179,7 +179,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 3000
+  far clip plane: 6000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -272,7 +272,7 @@ MonoBehaviour:
   islandTransform: {fileID: 0}
   perspectiveDistance: 20
   autoFindIsland: 1
-  speed: 200
+  speed: 50
   sens: 2
 --- !u!1 &410087039
 GameObject:
@@ -585,6 +585,10 @@ MonoBehaviour:
   renderAs3D: 1
   meshHeightMultiplier: 20
   meshResolution: 4
+  cactus: {fileID: 919132149155446097, guid: 7f4a46f5df61ee2449ebdf426c59686d, type: 3}
+  tree: {fileID: 919132149155446097, guid: ebc83d9d8661782438fdbeaff88b6440, type: 3}
+  wintertree: {fileID: 919132149155446097, guid: 4648b008dc48c9a46906d2a9a4eeebd9, type: 3}
+  palmtree: {fileID: 919132149155446097, guid: 1ca2c61c12c02f442a9cc72cd8e7c1cb, type: 3}
 --- !u!4 &2084971989
 Transform:
   m_ObjectHideFlags: 0
