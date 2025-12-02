@@ -21,4 +21,10 @@ public static class SettingsData
 
 
     public static string biomeType = "Default";
+    public static Color deepColor = new Color(0.0f, 0.2f, 0.5f);
+    public static Color shallowColor = new Color(0.2f, 0.4f, 0.7f);
+    public static Color sandColor = new Color(0.9f, 0.9f, 0.6f);
+    public static Color grassColor = new Color(0.2f, 0.6f, 0.2f);
+    public static Color rockColor = new Color(0.5f, 0.5f, 0.5f);
+    public static Color snowColor = new Color(0.95f, 0.95f, 0.95f);
 }

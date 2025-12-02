@@ -185,6 +185,56 @@ public class SettingsAdjuster : MonoBehaviour
         print("Selected Biome: " + biomeType);
     }
 
+    public Color[] SetBiomeColors(string selectedBiome)
+    {
+        // order: deep, shallow, sand, grass, rock, snow 
+        Color[] biomeColors;
+        switch (selectedBiome)
+        {
+            case "Default":
+                biomeColors =  new Color[] { 
+                    new Color(0.0f, 0.2f, 0.5f), 
+                    new Color(0.2f, 0.4f, 0.7f), 
+                    new Color(0.9f, 0.9f, 0.6f), 
+                    new Color(0.2f, 0.6f, 0.2f), 
+                    new Color(0.5f, 0.5f, 0.5f), 
+                    new Color(0.95f, 0.95f, 0.95f)
+                };
+                return biomeColors;
+            case "Mountain":
+                biomeColors = new Color[] {
+                    new Color(0.0f, 0.3f, 0.1f),
+                    new Color(0.1f, 0.4f, 0.15f),
+                    new Color(0.2f, 0.2f, 0.2f),
+                    new Color(0.45f, 0.45f, 0.45f),
+                    new Color(0.8f, 0.8f, 0.8f),
+                    new Color(0.95f, 0.95f, 0.95f)
+                };
+                return biomeColors;
+            case "Desert":
+                biomeColors = new Color[] {
+                    new Color(0.2f, 0.02f, 0.0f),
+                    new Color(0.45f, 0.0f, 0.05f),
+                    new Color(0.9f, 0.4f, 0.0f),
+                    new Color(1.0f, 0.8f, 0.4f),
+                    new Color(0.55f, 0.2f, 0.0f),
+                    new Color(0.55f, 0.2f, 0.0f)
+                };
+                return biomeColors;
+            case "Island":
+                biomeColors = new Color[] {
+                    new Color(0.0f, 0.45f, 0.5f),
+                    new Color(0.2f, 0.75f, 0.75f),
+                    new Color(0.7f, 0.5f, 0.2f),
+                    new Color(1.0f, 0.9f, 0.5f),
+                    new Color(1.0f, 0.95f, 0.8f),
+                    new Color(1.0f, 0.95f, 0.8f)
+                };
+                return biomeColors;
+        }
+        return null;
+    }
+
 
     public void LoadScene()
     {
@@ -202,6 +252,15 @@ public class SettingsAdjuster : MonoBehaviour
         SettingsData.isVoxel = voxelToggle.isOn;
         SettingsData.isRadial = radialToggle.isOn;
         SettingsData.biomeType = biomeType;
+        Color[] biomeColors = SetBiomeColors(biomeType);
+        
+        SettingsData.deepColor = biomeColors[0];
+        SettingsData.shallowColor = biomeColors[1];
+        SettingsData.sandColor = biomeColors[2];
+        SettingsData.grassColor = biomeColors[3];
+        SettingsData.rockColor = biomeColors[4];
+        SettingsData.snowColor = biomeColors[5];
+        
 
         settingsPanel.SetActive(false);
         loadingPanel.SetActive(true);

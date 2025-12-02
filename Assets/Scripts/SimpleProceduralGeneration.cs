@@ -79,6 +79,12 @@ public class SimpleProceduralGeneration : MonoBehaviour
         useVoxels = SettingsData.isVoxel;
         useRadial = SettingsData.isRadial;
         biometype = SettingsData.biomeType;
+        deepWaterColor = SettingsData.deepColor;
+        shallowWaterColor = SettingsData.shallowColor;
+        sandColor = SettingsData.sandColor;
+        grassColor = SettingsData.grassColor;
+        rockColor = SettingsData.rockColor;
+        snowColor = SettingsData.snowColor;
     }
 
     void Start()
