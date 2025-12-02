@@ -235,6 +235,11 @@ public class SettingsAdjuster : MonoBehaviour
         return null;
     }
 
+    public void LoadPreviousScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+    }
+
 
     public void LoadScene()
     {
