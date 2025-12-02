@@ -357,7 +357,7 @@ public class SimpleProceduralGeneration : MonoBehaviour
             case "Desert":
                 if(Random.Range(0f, 1f) < 0.01f)
                 {
-                    Vector3 pos = new Vector3(i, h + 1.4f, j);
+                    Vector3 pos = new Vector3(i*VoxelSize, (h + 1.4f)*VoxelSize, j * VoxelSize);
                     createModel(pos, cactus);
                 }
                 break;
@@ -366,26 +366,26 @@ public class SimpleProceduralGeneration : MonoBehaviour
 
                 if (landHeight < .1f && Random.Range(0f, 1f) < 0.3f)
                 {
-                    Vector3 pos = new Vector3(i, h+1.5f, j);
+                    Vector3 pos = new Vector3(i * VoxelSize, (h+1.5f)*VoxelSize, j * VoxelSize);
                     createModel(pos, tree);
                 }
                 else if (landHeight > .8f && Random.Range(0f, 1f) < 0.1f)
                 {
-                    Vector3 pos = new Vector3(i, h+0.5f, j);
+                    Vector3 pos = new Vector3(i * VoxelSize, (h+0.5f) * VoxelSize, j * VoxelSize);
                     createModel(pos, wintertree);
                 }
                 break;
             case "Island":
                 if (landHeight > 0.1f && Random.Range(0f, 1f) < 0.02f)
                 {
-                    Vector3 pos = new Vector3(i, h+1f, j);
+                    Vector3 pos = new Vector3(i * VoxelSize, (h+1f)*VoxelSize, j * VoxelSize);
                     createModel(pos, palmtree);
                 }
                 break;
             default:
                 if (landHeight > 0.2f && Random.Range(0f, 1f) < 0.06f)
                 {
-                    Vector3 pos = new Vector3(i, h+1.5f, j);
+                    Vector3 pos = new Vector3(i * VoxelSize, (h+1.5f)*VoxelSize, j * VoxelSize);
                     createModel(pos, tree);
                 }
                 break;
