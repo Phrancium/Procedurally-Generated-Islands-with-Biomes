@@ -175,12 +175,12 @@ public class SimpleProceduralGeneration : MonoBehaviour
         float[,] layer1 = new float[width, height];
         float[,] layer2 = new float[width, height];
         float[,] layer3 = new float[width, height];
-        PerlinNoise(layer1, gradiantWidth, gradiantHeight, islandHeight*.6f);
-        remapNoise(layer1, islandHeight*.7f);
-        PerlinNoise(layer2, gradiantWidth*4, gradiantHeight, islandHeight*.2f);
-        remapNoise(layer2, islandHeight*.15f);
-        PerlinNoise(layer3, gradiantWidth, gradiantHeight*4, islandHeight * .2f);
-        remapNoise(layer3, islandHeight*.15f);
+        PerlinNoise(layer1, gradiantWidth, gradiantHeight, islandHeight*noiseWeight1);
+        remapNoise(layer1, islandHeight*noiseScale1);
+        PerlinNoise(layer2, gradiantWidth*2, gradiantHeight/2, islandHeight*noiseWeight2);
+        remapNoise(layer2, islandHeight*noiseScale2);
+        PerlinNoise(layer3, gradiantWidth/2, gradiantHeight*2, islandHeight * noiseWeight2);
+        remapNoise(layer3, islandHeight*noiseScale2);
 
         for (int i = 0; i < width; i++)
         {
